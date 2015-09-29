@@ -91,12 +91,12 @@ public class SparkDBSCAN implements Serializable{
 
         System.out.println("*** See file with timestamp: " + ms);
 
-        /*
+
         cc.edges().toJavaRDD().map(t -> {
             Edge dt = (Edge)t;
             return String.format("%d,%d", dt.srcId(), dt.dstId());
         }).distinct().saveAsTextFile(outputFolder + "/cc_edges_" + ms + ".csv");
-        */
+
 
         JavaPairRDD<Long, Edge<GeoPoint>> ccTriplets = cc.triplets().toJavaRDD().distinct().mapToPair(ze -> {
             EdgeTriplet<Long, GeoPoint> et = (EdgeTriplet<Long, GeoPoint>) ze;

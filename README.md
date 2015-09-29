@@ -1,6 +1,9 @@
 # spark-dbscan
 DBSCAN clustering algorithm implemented in Apache Spark (MapReduce Framework).
 
+# Algorithm
+
+![Algorithm](results/dbscan_results.jpeg)
 
 ## Input Data
 
@@ -8,8 +11,8 @@ DBSCAN clustering algorithm implemented in Apache Spark (MapReduce Framework).
 
 ## Output Data (Including Noise)
 
-![Input Data](results/output_data_with_noise.jpeg)
+![Output Data (Including Noise)](results/output_data_with_noise.jpeg)
 
 ## Output Data (Without Noise)
 
-![Input Data](results/output_data_cleaned.jpeg)
+![Output Data (Without Noise)](results/output_data_cleaned.jpeg)
