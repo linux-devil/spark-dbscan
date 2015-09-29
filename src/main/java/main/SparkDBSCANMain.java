@@ -1,8 +1,8 @@
 package main;
 
-import bean.GeoPoint;
 import clustering.SparkDBSCAN;
-import indexing.KDTree;
+import configuration.SparkFactory;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
 /**
@@ -29,10 +29,14 @@ public class SparkDBSCANMain {
         ));
 
 
-        JavaSparkContext sc = null;
+        JavaSparkContext jsc = new SparkFactory()
+                .setMaster("local[4]")
+                .sparkContext("Spark DBSCAN");
 
-        SparkDBSCAN dbScan = new SparkDBSCAN(sc, epsilon, minPts, inputPath, outputPath);
+
+        SparkDBSCAN dbScan = new SparkDBSCAN(jsc, epsilon, minPts, inputPath, outputPath);
         dbScan.clustering();
+        jsc.close();
     }
 
 }

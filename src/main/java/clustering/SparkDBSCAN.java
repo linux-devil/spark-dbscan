@@ -10,6 +10,8 @@ import org.apache.spark.graphx.*;
 import org.apache.spark.graphx.impl.EdgeRDDImpl;
 import org.apache.spark.graphx.impl.GraphImpl;
 import scala.Tuple2;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Created by wlucia on 29/09/15.
  */
-public class SparkDBSCAN {
+public class SparkDBSCAN implements Serializable{
     private double epsilon;
     private int minPts;
     private String inputFile;
@@ -89,10 +91,12 @@ public class SparkDBSCAN {
 
         System.out.println("*** See file with timestamp: " + ms);
 
+        /*
         cc.edges().toJavaRDD().map(t -> {
             Edge dt = (Edge)t;
             return String.format("%d,%d", dt.srcId(), dt.dstId());
-        }).distinct().saveAsTextFile(outputFolder + "/cc_nodes_" + ms + ".csv");
+        }).distinct().saveAsTextFile(outputFolder + "/cc_edges_" + ms + ".csv");
+        */
 
         JavaPairRDD<Long, Edge<GeoPoint>> ccTriplets = cc.triplets().toJavaRDD().distinct().mapToPair(ze -> {
             EdgeTriplet<Long, GeoPoint> et = (EdgeTriplet<Long, GeoPoint>) ze;
@@ -127,7 +131,7 @@ public class SparkDBSCAN {
             }
 
             return cluster;
-        }).saveAsTextFile(outputFolder + "/triplets_" + ms + ".csv");
+        }).saveAsTextFile(outputFolder + "/clusters_" + ms + ".csv");
 
     }
 
