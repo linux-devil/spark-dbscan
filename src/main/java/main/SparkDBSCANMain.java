@@ -17,8 +17,6 @@ public class SparkDBSCANMain {
             System.exit(-1);
         }
 
-        long R = 6378388;
-
         double epsilon = Double.parseDouble(args[0]);
         int minPts = Integer.parseInt(args[1]);
         String inputPath = args[2];
@@ -35,11 +33,6 @@ public class SparkDBSCANMain {
 
         SparkDBSCAN dbScan = new SparkDBSCAN(sc, epsilon, minPts, inputPath, outputPath);
         dbScan.clustering();
-    }
-
-    private static synchronized void addPointToKdTree(GeoPoint p, KDTree<GeoPoint> pkdt) {
-        pkdt.insert(new double[]{p.getLat(), p.getLng()}, p);
-    }
     }
 
 }
