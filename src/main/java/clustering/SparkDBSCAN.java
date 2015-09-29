@@ -10,7 +10,6 @@ import org.apache.spark.graphx.*;
 import org.apache.spark.graphx.impl.EdgeRDDImpl;
 import org.apache.spark.graphx.impl.GraphImpl;
 import scala.Tuple2;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
