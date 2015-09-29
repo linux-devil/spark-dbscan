@@ -1,6 +1,6 @@
 package clustering;
 
-import bean.VisitBean;
+import bean.GeoPoint;
 import indexing.KDTree;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -35,7 +35,7 @@ public class SparkDBSCAN {
         this.outputFolder = outputFolder;
     }
 
-    private static synchronized void addPointToKdTree(VisitBean sb, KDTree<VisitBean> kdt) {
+    private static synchronized void addPointToKdTree(GeoPoint sb, KDTree<GeoPoint> kdt) {
         kdt.insert(new double[]{sb.getLat(), sb.getLng()}, sb);
     }
 
@@ -47,14 +47,14 @@ public class SparkDBSCAN {
 
         Broadcast<AtomicLong> bgen = sc.broadcast(idGen);
 
-        KDTree<VisitBean> pkdt = new KDTree<>(2);
-        Broadcast<KDTree<VisitBean>> bpkdt = sc.broadcast(pkdt);
+        KDTree<GeoPoint> pkdt = new KDTree<>(2);
+        Broadcast<KDTree<GeoPoint>> bpkdt = sc.broadcast(pkdt);
         System.out.println("*** GENERATING POINTS");
 
         // generating single points
-        JavaRDD<Tuple2<Object, VisitBean>> points = rows.map(r -> {
+        JavaRDD<Tuple2<Object, GeoPoint>> points = rows.map(r -> {
             String[] fields = r.split(",");
-            VisitBean sb = new VisitBean();
+            GeoPoint sb = new GeoPoint();
             sb.setId(Long.parseLong(fields[0]));
             sb.setLat(Double.parseDouble(fields[1]));
             sb.setLng(Double.parseDouble(fields[2]));
@@ -64,25 +64,25 @@ public class SparkDBSCAN {
 
         System.out.println(String.format("There are %d points.", points.count()));
 
-        JavaRDD<Edge<VisitBean>> edges = points.flatMap(p -> {
-            VisitBean spb = p._2();
-            List<VisitBean> nn = bpkdt.getValue().ballSearch(new double[]{spb.getLat(), spb.getLng()}, epsilon);
+        JavaRDD<Edge<GeoPoint>> edges = points.flatMap(p -> {
+            GeoPoint spb = p._2();
+            List<GeoPoint> nn = bpkdt.getValue().ballSearch(new double[]{spb.getLat(), spb.getLng()}, epsilon);
             if (nn.size() >= minPts - 1) { // skip my self
                 return nn.stream()
                         .map(t -> new Edge<>(spb.getId(), t.getId(), spb))
                         .collect(Collectors.toList());
             }else{
-                ArrayList<Edge<VisitBean>> loop = new ArrayList<>();
+                ArrayList<Edge<GeoPoint>> loop = new ArrayList<>();
                 loop.add(new Edge<>(spb.getId(), spb.getId(), spb));
                 return loop;
             }
         });
 
-        EdgeRDDImpl<VisitBean, Long> e = EdgeRDD.fromEdges(edges.rdd(), scala.reflect.ClassTag$.MODULE$.apply(VisitBean.class), scala.reflect.ClassTag$.MODULE$.apply(Long.class));
-        VertexRDD<VisitBean> v = VertexRDD.apply(points.rdd(), (EdgeRDD) e, null, scala.reflect.ClassTag$.MODULE$.apply(VisitBean.class));
+        EdgeRDDImpl<GeoPoint, Long> e = EdgeRDD.fromEdges(edges.rdd(), scala.reflect.ClassTag$.MODULE$.apply(GeoPoint.class), scala.reflect.ClassTag$.MODULE$.apply(Long.class));
+        VertexRDD<GeoPoint> v = VertexRDD.apply(points.rdd(), (EdgeRDD) e, null, scala.reflect.ClassTag$.MODULE$.apply(GeoPoint.class));
 
         GraphImpl g = GraphImpl.apply(v, e,
-                scala.reflect.ClassTag$.MODULE$.apply(VisitBean.class),
+                scala.reflect.ClassTag$.MODULE$.apply(GeoPoint.class),
                 scala.reflect.ClassTag$.MODULE$.apply(Long.class));
 
         Graph cc = g.ops().connectedComponents();
@@ -95,17 +95,17 @@ public class SparkDBSCAN {
             return String.format("%d,%d", dt.srcId(), dt.dstId());
         }).distinct().saveAsTextFile(outputFolder + "/cc_nodes_" + ms + ".csv");
 
-        JavaPairRDD<Long, Edge<VisitBean>> ccTriplets = cc.triplets().toJavaRDD().distinct().mapToPair(ze -> {
-            EdgeTriplet<Long, VisitBean> et = (EdgeTriplet<Long, VisitBean>) ze;
+        JavaPairRDD<Long, Edge<GeoPoint>> ccTriplets = cc.triplets().toJavaRDD().distinct().mapToPair(ze -> {
+            EdgeTriplet<Long, GeoPoint> et = (EdgeTriplet<Long, GeoPoint>) ze;
             Long clusterId = et.srcAttr();
-            return new Tuple2<Long, Edge<VisitBean>>(clusterId, et);
+            return new Tuple2<Long, Edge<GeoPoint>>(clusterId, et);
         });
 
-        ccTriplets.aggregateByKey(new ArrayList<Edge<VisitBean>>(), (u, t) -> {
+        ccTriplets.aggregateByKey(new ArrayList<Edge<GeoPoint>>(), (u, t) -> {
             u.add(t);
             return u;
         }, (uA, uB) -> {
-            ArrayList<Edge<VisitBean>> uC = new ArrayList<>(uA);
+            ArrayList<Edge<GeoPoint>> uC = new ArrayList<>(uA);
             uC.addAll(uB);
             return uC;
         }).flatMap(c -> {

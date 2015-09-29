@@ -10,16 +10,16 @@ import java.io.Serializable;
  *
  * @author wlucia
  */
-public class VisitBean implements Serializable {
+public class GeoPoint implements Serializable {
 
     private Long id;
     private Double lat;
     private Double lng;
 
 
-    public VisitBean() {}
+    public GeoPoint() {}
 
-    public VisitBean(Long id, Double lat, Double lng) {
+    public GeoPoint(Long id, Double lat, Double lng) {
         this.id = id;
         this.lat = lat;
         this.lng = lng;
@@ -70,14 +70,14 @@ public class VisitBean implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof VisitBean) {
-            return this.equals((VisitBean) o);
+        if (o instanceof GeoPoint) {
+            return this.equals((GeoPoint) o);
         } else {
             return false;
         }
     }
 
-    public boolean equals(VisitBean s) {
+    public boolean equals(GeoPoint s) {
         return this.getId() == s.getId() &&
                 this.getLat().equals(s.getLat())
                 && this.getLng().equals(s.getLng());
