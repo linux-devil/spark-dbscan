@@ -3,6 +3,10 @@ DBSCAN clustering algorithm implemented in Apache Spark (MapReduce Framework).
 
 # Algorithm
 
+DBSCAN (Density-based spatial clustering of applications with noise) is a clustering algorithm
+
+
+
 ![Algorithm](results/dbscan_results.jpeg)
 
 ## Input Data
