@@ -5,7 +5,8 @@ for geographical data.
 
 ## Usage
 
-**Input**: input_file.csv  with format (id,lat,long), minPts, epsilon
+**Input**: input_file.csv  with format (id,lat,long), minPts, epsilon (in meters)
+
 **Output**: output_file.csv with format (id,lat,long,cluster_id)
 
 **Note**: This Algorithm use a **KD-Tree** for a fast computation of all neighbors
