@@ -26,15 +26,13 @@ Based on this definition we can have tree different type of points:
 
 - *Core Points*: points that have at least **minPts** that are at most **epsilon**
 far from it. They define a cluster.
+
 - *Density-reachable Point*: points that don't have **mintPts** neighbors under
 **epsilon**, but they have a **core-point** as neighbor. They belong to the same
 cluster of the **core-point**.
-- *Noise*: points that doesn't have
 
-
-
-
-
+- *Noise*: points that doesn't have neither **MinPts** points close up to distance **epsilon** nor a **core point**
+ in its **epsilon-neighborhood**. This point are marked as noise since they are not in a sufficiently dense area.
 
 
 ![Algorithm](results/dbscan_results.jpeg)
