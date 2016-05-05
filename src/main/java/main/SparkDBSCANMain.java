@@ -13,7 +13,7 @@ public class SparkDBSCANMain {
     public static void main(String[] args) {
         if(args.length != 4) {
             System.out.println("Bad Parameters :'(");
-            System.out.println("Usage: java -jar DistributedDbScan epsilon minPts inputFilePath inputFilePath");
+            System.out.println("Usage: java -jar DistributedDbScan epsilon minPts inputFilePath outputFilePath");
             System.exit(-1);
         }
 
